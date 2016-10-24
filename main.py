@@ -32,9 +32,16 @@ def list(section=None, category=None):
 
 
 def process_item(item):
+  image = item.image.string if item.image else None
+  if not image:
+    content = bs4.BeautifulSoup(item.description.string, 'html.parser')
+    img = content.img
+    if img:
+      image = img['src']
+
   return dict(title=item.title.string,
               link=item.link.string.replace('https://blog.google/', '/'),
-              image=item.image.string if item.image else None,
+              image=image,
               category=item.category.string,
               date=item.pubdate.string,
               author=item.author.find('name').string,
