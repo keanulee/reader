@@ -1,3 +1,53 @@
 body {
   font-family: sans-serif;
+  background: #EEE;
+  margin: 0;
 }
+
+.tiles {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 940px;
+}
+
+.tiles > a {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+
+  margin: 20px;
+  padding: 20px;
+  width: 230px;
+  height: 230px;
+
+  background: #FFF;
+  color: #000;
+  text-decoration: none;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tiles > a::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  content: '';
+
+  box-shadow: 0 0 20px #999;
+  opacity: 0.3;
+
+  transition: opacity 0.4s;
+  will-change: opacity;
+}
+
+.tiles > a:hover::before {
+  opacity: 1;
+}
+
+.tiles > a > img {
+  width: 100%;
+}
+

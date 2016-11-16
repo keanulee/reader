@@ -1,0 +1,211 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-location/iron-location.html">
+
+<style>
+
+  read-app {
+    display: block;
+    height: 100vh;
+    overflow: auto;
+
+    transition-property: transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+
+  .read-app-scrim {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background: #FFF;
+    opacity: 0;
+    visibility: hidden;
+
+    transform-origin: 0 0;
+
+    transition-property: transform, opacity, visibility;
+    transition-duration: 0.4s;
+  }
+
+  .read-app-scrim.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+</style>
+
+<script>
+
+  Polymer({
+
+    is: 'read-app',
+
+    properties: {
+
+      _playingExitTransition: Boolean,
+
+      _shellContent: String
+
+    },
+
+    _ironLocation: null,
+
+    _scrim: null,
+
+    observers: [
+      '_importShellContent(_shellContent, _playingExitTransition)'
+    ],
+
+    listeners: {
+      'transitionend': '_scrimTransitionend'
+    },
+
+    attached: function() {
+      if (!this._ironLocation) {
+        this._ironLocation = document.createElement('iron-location');
+        this._ironLocation.addEventListener('path-changed', this._pathChanged.bind(this));
+        this.parentElement.appendChild(this._ironLocation);
+      }
+
+      if (!this._scrim) {
+        this._scrim = document.createElement('div');
+        this._scrim.classList.add('read-app-scrim');
+        this._scrim.addEventListener('transitionend', this._scrimTransitionend.bind(this));
+        this.parentElement.appendChild(this._scrim);
+      }
+    },
+
+    _pathChanged: function(event) {
+      var path = event.detail.value;
+      this._fetchDoc(path);
+      this._playExitTransition(path);
+    },
+
+    _fetchDoc: function(path) {
+      this._shellContent = null;
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener('load', this._handleResponse.bind(this));
+      xhr.addEventListener('error', this._handleNetworkError.bind(this));
+      xhr.open('GET', path);
+      xhr.responseType = 'document';
+      xhr.send();
+    },
+
+    _handleResponse: function(event) {
+      var doc = event.target.response;
+      document.title = doc.title;
+      var shell = doc ? doc.querySelector('read-app') : null;
+      this._shellContent = shell ? this._getContentFrag(shell) : this._createFragFromText('Page Format Error');
+    },
+
+    _handleNetworkError: function(event) {
+      this._shellContent = this._createFragFromText('Network Error');
+    },
+
+    _getContentFrag: function(shell) {
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < shell.childNodes.length; ++i) {
+        frag.appendChild(document.importNode(shell.childNodes[i], true));
+      }
+      return frag;
+    },
+
+    _createFragFromText: function(text) {
+      var frag = document.createDocumentFragment();
+      frag.appendChild(document.createTextNode(text));
+      return frag;
+    },
+
+    _importShellContent: function(frag, playingExitTransition) {
+      if (frag && !playingExitTransition) {
+        var shell = Polymer.dom(this);
+        shell.innerHTML = '';
+        shell.appendChild(frag);
+        this._playEnterTransition();
+      }
+    },
+
+    _playExitTransition: function(path) {
+      var transitionTarget = this._getTransitionTarget(path);
+      this._playingExitTransition = true;
+      this._transitionName = transitionTarget ? transitionTarget.getAttribute('transition') : '';
+
+      switch (this._transitionName) {
+        case 'expand-background':
+          // Resize scrim to transition target position.
+          var targetRect = transitionTarget.getBoundingClientRect();
+          var tx = targetRect.left;
+          var ty = targetRect.top;
+          var sx = targetRect.width / window.innerWidth;
+          var sy = targetRect.height / window.innerHeight;
+          // Setup start state.
+          this._scrim.style.transitionDuration = '0s';
+          this._scrim.style.background = transitionTarget.style.background;
+          this._scrim.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sx + ',' + sy + ')';
+          // Force style recalc.
+          this._scrim.getBoundingClientRect();
+          // Start transition.
+          this._scrim.style.transitionDuration = '';
+          this._scrim.style.transform = '';
+          this._scrim.classList.add('visible');
+          break;
+        case 'slide-right':
+          this.style.transformTimingFunction = 'ease-in';
+          this.style.transform = 'translateX(100%)';
+          break;
+        case 'fade-scrim':
+        default:
+          this._scrim.style.background = '';
+          this._scrim.classList.add('visible');
+      }
+    },
+
+    _getTransitionTarget: function(path) {
+      return Polymer.dom(this).querySelector('[transition][href="' + path + '"]');
+    },
+
+    _scrimTransitionend: function(event) {
+      var target = Polymer.dom(event).localTarget;
+      if (target === this || target === this._scrim) {
+        if (this._playingExitTransition) {
+          this._playingExitTransition = false;
+        }
+      }
+    },
+
+    _playEnterTransition: function() {
+      switch (this._transitionName) {
+        case 'expand-background':
+          this._scrim.classList.remove('visible');
+          break;
+        case 'slide-right':
+          this.style.transitionDuration = '0s';
+          this.style.transform = 'translateX(-100%)';
+          // Force style recalc.
+          this.getBoundingClientRect();
+          this.style.transitionDuration = '';
+          this.style.transformTimingFunction = '';
+          this.style.transform = '';
+          break;
+        case 'fade-scrim':
+        default:
+          this._scrim.classList.remove('visible');
+      }
+    }
+
+  });
+
+</script>
+

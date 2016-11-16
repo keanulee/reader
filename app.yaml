@@ -3,6 +3,10 @@ api_version: 1
 threadsafe: true
 
 handlers:
+- url: /bower_components
+  static_dir: bower_components
+- url: /elements
+  static_dir: elements
 - url: /static
   static_dir: static
 - url: /.*

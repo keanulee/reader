@@ -1,0 +1,14 @@
+{
+  "name": "reader",
+  "homepage": "",
+  "authors": [
+    "Keanu Lee <keanulee@google.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "",
+  "private": true,
+  "dependencies": {
+    "iron-location": "polymerelements/iron-location#^0.8.9"
+  }
+}

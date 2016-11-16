@@ -1,11 +1,29 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{{ title }}</title>
+
     <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="import" href="/bower_components/polymer/polymer.html">
   </head>
   <body>
-    <h1>{{ title }}</h1>
+    <read-app>
+      <read-post>
+        <h1>{{ title }}</h1>
 
-    {{ html | safe }}
+        {{ html | safe }}
+      </read-post>
+
+      <script>
+        Polymer.Base.importHref('/elements/read-post.html');
+      </script>
+    </read-app>
+
+    <script>
+      Polymer.Base.importHref('/elements/read-app.html');
+    </script>
   </body>
 </html>
