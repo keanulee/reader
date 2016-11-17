@@ -19,7 +19,7 @@ def list(section=None, category=None):
     result = urllib2.urlopen(url)
     doc = bs4.BeautifulSoup(result.read(), 'html.parser')
 
-    title = doc.title.string
+    title = doc.find('title').string
     items = map(process_item, doc.find_all('item'))
 
     if request.args.get('json'):
@@ -55,8 +55,8 @@ def post(section, category, post):
     result = urllib2.urlopen(url)
     doc = bs4.BeautifulSoup(result.read(), 'html.parser')
 
-    title = doc.title.string
-    html = unicode(doc.find('div', class_='uni-blog-article-content'))
+    title = doc.find('title').string
+    html = process_post(doc)
 
     if request.args.get('json'):
       return jsonify(title=title, html=html)
@@ -65,6 +65,33 @@ def post(section, category, post):
 
   except urllib2.HTTPError, e:
     return '%s Error' % e.code, e.code
+
+
+def process_post(doc):
+  shell = doc.find('div', class_='uni-blog-article-content')
+
+  # Converts carousels into custom elements
+  carousels = shell.find_all(attrs={'uni-component':'carousel'})
+  for carousel in carousels:
+    # Make it a custom element
+    carousel.name = 'read-carousel'
+    del carousel['class']
+    del carousel['uni-component']
+
+    # Move content up so they are immediate children
+    carousel.find('div', class_='uni-carousel-container').unwrap()
+
+    # Remove controls (since they will be added to the shadow root by the element definition)
+    carousel.find('div', class_='uni-carousel-arrows-container').decompose()
+    carousel.find('nav').decompose()
+
+    # Append import script
+    link = doc.new_tag('link')
+    link['rel'] = 'import'
+    link['href'] = '/elements/read-carousel.html'
+    carousel.insert_after(link)
+
+  return unicode(shell)
 
 
 @app.errorhandler(500)

@@ -7,7 +7,10 @@
     <title>{{ title }}</title>
 
     <link rel="stylesheet" type="text/css" href="/static/style.css">
-    <link rel="import" href="/bower_components/polymer/polymer.html">
+
+    <script>
+      var Polymer = {lazyRegister: true, dom: 'shadow'};
+    </script>
   </head>
   <body>
     <read-app>
@@ -23,14 +26,31 @@
         {% endfor %}
         </div>
       </read-list>
+      <link rel="import" href="/elements/read-list.html">
 
-      <script>
-        Polymer.Base.importHref('/elements/read-list.html');
-      </script>
     </read-app>
+    <link rel="import" href="/elements/read-app.html">
 
     <script>
-      Polymer.Base.importHref('/elements/read-app.html');
+      (function() {
+        if ('registerElement' in document
+            && 'import' in document.createElement('link')
+            && 'content' in document.createElement('template')) {
+          // platform is good!
+        } else {
+          // polyfill the platform!
+          var e = document.createElement('script');
+          e.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+          document.body.appendChild(e);
+        }
+
+        // Load pre-caching Service Worker
+        // if ('serviceWorker' in navigator) {
+        //   window.addEventListener('load', function() {
+        //     navigator.serviceWorker.register('/service-worker.js');
+        //   });
+        // }
+      })();
     </script>
   </body>
 </html>
