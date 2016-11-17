@@ -9,6 +9,9 @@
   "license": "",
   "private": true,
   "dependencies": {
-    "iron-location": "polymerelements/iron-location#^0.8.9"
+    "iron-location": "polymerelements/iron-location#^0.8.9",
+    "app-layout": "polymerelements/app-layout#^0.10.6",
+    "paper-icon-button": "polymerelements/paper-icon-button#^1.1.3",
+    "iron-iconset-svg": "polymerelements/iron-iconset-svg#^1.1.0"
   }
 }

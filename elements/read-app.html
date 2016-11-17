@@ -12,16 +12,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <style>
 
-  read-app {
-    display: block;
-    height: 100vh;
-    overflow: auto;
-
-    transition-property: transform;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-out;
-  }
-
   .read-app-scrim {
     position: fixed;
     top: 0;
@@ -32,11 +22,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     background: #FFF;
     opacity: 0;
     visibility: hidden;
+    box-shadow: #999 0px 0px 20px;
 
     transform-origin: 0 0;
 
     transition-property: transform, opacity, visibility;
-    transition-duration: 0.4s;
+    transition-duration: 0.3s;
   }
 
   .read-app-scrim.visible {
@@ -143,27 +134,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       this._transitionName = transitionTarget ? transitionTarget.getAttribute('transition') : '';
 
       switch (this._transitionName) {
-        case 'expand-background':
-          // Resize scrim to transition target position.
-          var targetRect = transitionTarget.getBoundingClientRect();
-          var tx = targetRect.left;
-          var ty = targetRect.top;
-          var sx = targetRect.width / window.innerWidth;
-          var sy = targetRect.height / window.innerHeight;
+        case 'slide-up':
           // Setup start state.
           this._scrim.style.transitionDuration = '0s';
-          this._scrim.style.background = transitionTarget.style.background;
-          this._scrim.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sx + ',' + sy + ')';
+          this._scrim.style.opacity = '1';
+          this._scrim.style.transform = 'translate3d(0, 100%, 0)';
           // Force style recalc.
           this._scrim.getBoundingClientRect();
           // Start transition.
           this._scrim.style.transitionDuration = '';
+          this._scrim.style.opacity = '';
           this._scrim.style.transform = '';
           this._scrim.classList.add('visible');
-          break;
-        case 'slide-right':
-          this.style.transformTimingFunction = 'ease-in';
-          this.style.transform = 'translateX(100%)';
           break;
         case 'fade-scrim':
         default:
@@ -187,17 +169,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     _playEnterTransition: function() {
       switch (this._transitionName) {
-        case 'expand-background':
+        case 'slide-up':
           this._scrim.classList.remove('visible');
-          break;
-        case 'slide-right':
-          this.style.transitionDuration = '0s';
-          this.style.transform = 'translateX(-100%)';
-          // Force style recalc.
-          this.getBoundingClientRect();
-          this.style.transitionDuration = '';
-          this.style.transformTimingFunction = '';
-          this.style.transform = '';
           break;
         case 'fade-scrim':
         default:
