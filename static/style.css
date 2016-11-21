@@ -10,6 +10,7 @@ read-list > .tiles {
 read-list > .tiles > a {
   position: relative;
   display: flex;
+  min-height: 200px;
   margin: 20px 0;
   background: #FFF;
   color: #000;
@@ -43,13 +44,27 @@ read-list > .tiles > a > img {
   object-fit: cover;
 }
 
-read-list > .tiles > a > h2 {
+read-list > .tiles > a > .info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+read-list > .tiles > a > .info > h2 {
   flex: 1;
   margin: 20px;
   font-size: 1.2em;
 }
 
-@media (max-width: 425px) {
+read-list > .tiles > a > .info > .meta {
+  margin: 0 20px 20px;
+}
+
+read-list > .tiles > a > .info > .meta > .category {
+  float: right;
+}
+
+@media (max-width: 500px) {
   read-list > .tiles > a {
     flex-direction: column;
   }

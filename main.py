@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 import bs4
@@ -33,17 +34,17 @@ def list(section=None, category=None):
 
 def process_item(item):
   image = item.image.string if item.image else None
-  if not image:
-    content = bs4.BeautifulSoup(item.description.string, 'html.parser')
-    img = content.img
-    if img:
-      image = img['src']
+  # if not image:
+  #   content = bs4.BeautifulSoup(item.description.string, 'html.parser')
+  #   img = content.img
+  #   if img:
+  #     image = img['src']
 
   return dict(title=item.title.string,
               link=item.link.string.replace('https://blog.google/', '/'),
               image=image,
               category=item.category.string,
-              date=item.pubdate.string,
+              date=datetime.strptime(item.pubdate.string, '%a, %d %b %Y %H:%M:%S +0000'),
               author=item.author.find('name').string,
               description=item.og.description.string)
 
