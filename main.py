@@ -71,7 +71,7 @@ def post(section, category, post):
 def process_post(doc):
   shell = doc.find('div', class_='uni-blog-article-content')
 
-  # Converts carousels into custom elements
+  # Convert carousels into custom elements
   carousels = shell.find_all(attrs={'uni-component':'carousel'})
   for carousel in carousels:
     # Make it a custom element
@@ -91,6 +91,36 @@ def process_post(doc):
     link['rel'] = 'import'
     link['href'] = '/elements/read-carousel.html'
     carousel.insert_after(link)
+
+  # Convert videos into custom elements
+  videos = shell.find_all(attrs={'uni-component':'video'})
+  for video in videos:
+    # Make it a custom element
+    video.name = 'read-video'
+    video['video-id'] = video['uni-video-id']
+    del video['class']
+    del video['uni-component']
+    del video['uni-options']
+    del video['uni-video-id']
+    del video['uni-block-index']
+
+    # Move content up so they are immediate children
+    video.find('div', class_='uni-video').unwrap()
+
+    # Remove controls (since they will be added to the shadow root by the element definition)
+    overlay = video.find('div', class_='uni-video-overlay')
+    if overlay:
+      overlay.decompose()
+    video.find('div').decompose()
+    button = video.find('button')
+    if button:
+      button.decompose()
+
+    # Append import script
+    link = doc.new_tag('link')
+    link['rel'] = 'import'
+    link['href'] = '/elements/read-video.html'
+    video.insert_after(link)
 
   return unicode(shell)
 

@@ -79,6 +79,7 @@ read-post figure {
   margin: 0;
 }
 
-read-post figure img {
+read-post figure img,
+read-post read-video img {
   width: 100%;
 }
