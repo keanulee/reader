@@ -75,6 +75,11 @@ read-list > .tiles > a > .info > .meta > .category {
   }
 }
 
+read-post > .container {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
 read-post figure {
   margin: 0;
 }

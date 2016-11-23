@@ -15,9 +15,11 @@
   <body>
     <read-app>
       <read-post>
-        <h1>{{ title }}</h1>
+        <div class="container">
+          <h1>{{ title }}</h1>
 
-        {{ html | safe }}
+          {{ html | safe }}
+        </div>
       </read-post>
       <link rel="import" href="/elements/read-post.html">
 
