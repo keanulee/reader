@@ -41,7 +41,7 @@ def process_item(item):
   #     image = img['src']
 
   return dict(title=item.title.string,
-              link=item.link.string.replace('https://blog.google/', '/'),
+              link=item.link.string.replace('http://blog.google:443/', '/'),
               image=image,
               category=item.category.string,
               date=datetime.strptime(item.pubdate.string, '%a, %d %b %Y %H:%M:%S +0000'),
