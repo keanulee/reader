@@ -57,12 +57,13 @@ def post(section, category, post):
     doc = bs4.BeautifulSoup(result.read(), 'html.parser')
 
     title = doc.find('title').string
+    meta = '\n'.join(map(unicode, doc.find_all('meta')))
     html = process_post(doc)
 
     if request.args.get('json'):
       return jsonify(title=title, html=html)
 
-    return render_template('post.html', title=title, html=html)
+    return render_template('post.html', title=title, meta=meta, html=html)
 
   except urllib2.HTTPError, e:
     return '%s Error' % e.code, e.code
@@ -86,7 +87,7 @@ def process_post(doc):
     carousel.find('div', class_='uni-carousel-arrows-container').decompose()
     carousel.find('nav').decompose()
 
-    # Append import script
+    # Append HTML import
     link = doc.new_tag('link')
     link['rel'] = 'import'
     link['href'] = '/elements/read-carousel.html'
@@ -116,7 +117,7 @@ def process_post(doc):
     if button:
       button.decompose()
 
-    # Append import script
+    # Append HTML import
     link = doc.new_tag('link')
     link['rel'] = 'import'
     link['href'] = '/elements/read-video.html'
